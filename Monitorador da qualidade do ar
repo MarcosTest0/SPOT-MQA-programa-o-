@@ -73,16 +73,10 @@ void setup() {
 void loop() {
   int valorMQ2 = analogRead(MQ2_PIN);  // Lê o valor do sensor MQ-2 (0 a 1023)
 
-  // Envia o valor lido do sensor para o Monitor Serial
-  Serial.print("Valor do Sensor MQ-2: ");
-  Serial.println(valorMQ2);
-
   // Verifica se o valor do sensor ultrapassou o limite
   if (valorMQ2 > LIMIAR_DETACAO) {
-    Serial.println("ALERTA: Gás detectado!");
     digitalWrite(LED_PIN, HIGH);  // Liga o LED quando o gás for detectado
   } else {
-    Serial.println("Nenhuma presença de gás detectada.");
     digitalWrite(LED_PIN, LOW);   // Desliga o LED quando não há gás
   }
 

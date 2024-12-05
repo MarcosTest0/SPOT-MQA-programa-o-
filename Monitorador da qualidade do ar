@@ -1,0 +1,89 @@
+// Inclui as bibliotecas
+#include <LiquidCrystal.h>
+#include <DHT.h>
+
+// Definindo o pino do LCD
+const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+
+// Definindo o pino onde o sensor DHT11 está conectado
+#define DHTPIN 6     // O pino 6 do Arduino para o sensor
+
+// Definindo o tipo do sensor DHT11
+#define DHTTYPE DHT11   
+
+// Criação do objeto DHT
+DHT dht(DHTPIN, DHTTYPE);
+
+void setup() {
+  // Inicializa a comunicação serial
+  Serial.begin(9600);
+
+  // Inicializa o sensor DHT11
+  dht.begin();
+
+  // Inicializa o LCD com 16 colunas e 2 linhas
+  lcd.begin(16, 2);
+}
+
+void loop() {
+  // Lê a umidade e a temperatura
+  float h = dht.readHumidity();    // Lê a umidade
+  float t = dht.readTemperature(); // Lê a temperatura em Celsius
+
+  // Verifica se a leitura falhou e exibe um erro no Monitor Serial
+  if (isnan(h) || isnan(t)) {
+    Serial.println("Falha ao ler o sensor DHT!");
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Erro no sensor");
+    return;
+  }
+
+  // Limpa o LCD para a próxima exibição
+  lcd.clear();
+
+  // Exibe os valores de temperatura e umidade no LCD
+  lcd.setCursor(0, 0); 
+  lcd.print("Temp: ");
+  lcd.print(t);
+  lcd.print(" C");
+
+  lcd.setCursor(0, 1); 
+  lcd.print("Umid: ");
+  lcd.print(h);
+  lcd.print(" %");
+
+  // Aguarda 2 segundos antes de atualizar os valores
+  delay(2000);
+=====================
+#define MQ2_PIN A0  // Pino analógico do MQ-2
+#define LED_PIN 13   // Pino digital para o LED (Alerta de gás)
+
+#define LIMIAR_DETACAO 600  // Limiar para detectar presença de gás (ajuste conforme necessário)
+
+void setup() {
+  Serial.begin(9600);  // Inicializa a comunicação serial
+  pinMode(MQ2_PIN, INPUT);  // Configura o pino do MQ-2 como entrada
+  pinMode(LED_PIN, OUTPUT);  // Configura o pino do LED como saída
+  digitalWrite(LED_PIN, LOW);  // Garante que o LED esteja apagado inicialmente
+  Serial.println("Sensor MQ-2 iniciado. Aguardando leitura...");
+}
+
+void loop() {
+  int valorMQ2 = analogRead(MQ2_PIN);  // Lê o valor do sensor MQ-2 (0 a 1023)
+
+  // Envia o valor lido do sensor para o Monitor Serial
+  Serial.print("Valor do Sensor MQ-2: ");
+  Serial.println(valorMQ2);
+
+  // Verifica se o valor do sensor ultrapassou o limite
+  if (valorMQ2 > LIMIAR_DETACAO) {
+    Serial.println("ALERTA: Gás detectado!");
+    digitalWrite(LED_PIN, HIGH);  // Liga o LED quando o gás for detectado
+  } else {
+    Serial.println("Nenhuma presença de gás detectada.");
+    digitalWrite(LED_PIN, LOW);   // Desliga o LED quando não há gás
+  }
+
+  delay(1000);  // Atraso de 1 segundo antes de realizar a próxima leitura
